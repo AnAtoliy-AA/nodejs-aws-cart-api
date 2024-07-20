@@ -2,6 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { Handler, Context, Callback } from 'aws-lambda';
 import { createServer, proxy } from 'aws-serverless-express';
 import * as express from 'express';
+import 'reflect-metadata';
+import { createConnection } from 'typeorm';
+import { Cart } from './entities/Cart';
+import { CartItem } from './entities/CartItem';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 import helmet from 'helmet';
 
@@ -24,17 +31,38 @@ async function bootstrap() {
 
   return createServer(expressApp);
 }
-// bootstrap().then(() => {
-//   console.log('App is running on %s port', port);
-// });
 
-let cachedServer: any;
+let cachedConnection: Connection | null = null;
+let cachedServer: any = null; 
 
-export const handler: Handler = async (event: any, context: Context, callback: Callback) => {
-  if (!cachedServer) {
-    cachedServer = await bootstrap();
+export const handler: Handler = async (
+  event: any,
+  context: Context,
+  callback: Callback,
+) => {
+  try {
+    if (!cachedConnection) {
+      cachedConnection = await createConnection({
+        type: 'postgres',
+        host: process.env.DB_HOST,
+        port: parseInt(process.env.DB_PORT || '5432', 10),
+        username: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        entities: [Cart, CartItem],
+        synchronize: true,
+      });
+      console.log('Connected to PostgreSQL');
+    }
 
-    console.log('App is running on %s port', port);
+    if (!cachedServer) {
+      cachedServer = await bootstrap();
+      console.log('App is running on port %s', process.env.PORT || '3000'); // Adjust as necessary
+    }
+
+    return proxy(cachedServer, event, context, 'PROMISE').promise;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error; 
   }
-  return proxy(cachedServer, event, context, 'PROMISE').promise;
 };
