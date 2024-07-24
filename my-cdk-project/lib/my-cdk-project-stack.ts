@@ -20,7 +20,7 @@ export class MyCdkProjectStack extends cdk.Stack {
 
     const nestLambda = new lambda.Function(this, 'NestLambda', {
       runtime: lambda.Runtime.NODEJS_20_X,
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist/src')),
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../myLambdaArchive.zip')),
       handler: 'main.handler',
       memorySize: 512,
       timeout: cdk.Duration.seconds(30),
