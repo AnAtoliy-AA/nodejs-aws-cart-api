@@ -17,11 +17,10 @@ export class MyCdkProjectStack extends cdk.Stack {
       maxAzs: 2,
     });
 
-
     const nestLambda = new lambda.Function(this, 'NestLambda', {
       runtime: lambda.Runtime.NODEJS_20_X,
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../myLambdaArchive.zip')),
-      handler: 'main.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../dist')),
+      handler: 'bundle.handler',
       memorySize: 512,
       timeout: cdk.Duration.seconds(30),
       functionName: 'NestAwsCartFunction',
