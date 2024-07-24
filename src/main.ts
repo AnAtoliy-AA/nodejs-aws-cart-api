@@ -4,11 +4,9 @@ import { createServer, proxy } from 'aws-serverless-express';
 import * as express from 'express';
 import 'reflect-metadata';
 import { Connection, createConnection } from 'typeorm';
-import { Cart } from './entities/Cart';
-import { CartItem } from './entities/CartItem';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { CartEntity } from './entities/Cart';
+import { CartItemEntity } from './entities/CartItem';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
 import helmet from 'helmet';
 
@@ -17,6 +15,17 @@ import { AppModule } from './app.module';
 const port = process.env.PORT || 4000;
 
 const expressApp = express();
+
+async function getDatabaseCredentials(secretArn: string) {
+  const client = new SecretsManagerClient({ region: 'eu-central-1' });
+  const command = new GetSecretValueCommand({ SecretId: secretArn });
+  const response = await client.send(command);
+  const secret = JSON.parse(response.SecretString || '{}');
+  return {
+    username: secret.username,
+    password: secret.password,
+  };
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -41,15 +50,21 @@ export const handler: Handler = async (
   callback: Callback,
 ) => {
   try {
+    console.log('LAMBDA ENV: ', process.env.DB_HOST)
+
     if (!cachedConnection) {
+      const { username, password } = await getDatabaseCredentials(process.env.DB_SECRET_ARN as string);
+
+      console.log('Database Credentials: ', username, password)
+
       cachedConnection = await createConnection({
         type: 'postgres',
         host: process.env.DB_HOST,
         port: parseInt(process.env.DB_PORT || '5432', 10),
-        username: process.env.DB_USERNAME,
-        password: process.env.DB_PASSWORD,
+        username,
+        password,
         database: process.env.DB_NAME,
-        entities: [Cart, CartItem],
+        entities: [CartEntity, CartItemEntity],
         synchronize: true,
       });
       console.log('Connected to PostgreSQL');

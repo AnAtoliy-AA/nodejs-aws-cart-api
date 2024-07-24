@@ -1,13 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { Cart } from "./Cart";
+import { CartEntity } from "./Cart";
 
 @Entity()
-export class CartItem {
+export class CartItemEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @ManyToOne(() => Cart, (cart) => cart.items)
-  cart: Cart;
+  @ManyToOne(() => CartEntity, (cart) => cart.items)
+  cart: CartEntity;
 
   @Column()
   product_id: string;

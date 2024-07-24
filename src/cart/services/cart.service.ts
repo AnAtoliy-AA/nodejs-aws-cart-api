@@ -1,22 +1,36 @@
 import { Injectable } from '@nestjs/common';
-
+import { InjectRepository } from '@nestjs/typeorm';
 import { v4 } from 'uuid';
 
-import { Cart } from '../models';
+import { CartStatuses, Cart } from '../models';
+import { CartEntity } from 'src/entities/Cart';
+import { CartItemEntity } from 'src/entities/CartItem';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CartService {
-  private userCarts: Record<string, Cart> = {};
+  constructor(
+    @InjectRepository(CartItemEntity)
+    private cartItemsRepository: Repository<CartItemEntity>,
+    @InjectRepository(CartEntity)
+    private cartRepository: Repository<CartEntity>,
+  ) {}
 
-  findByUserId(userId: string): Cart {
+  private userCarts: Record<string, CartEntity> = {};
+
+  async findByUserId(userId: string): Promise<CartEntity> {
     return this.userCarts[ userId ];
   }
 
-  createByUserId(userId: string) {
+  async createByUserId(userId: string) {
     const id = v4();
     const userCart = {
       id,
       items: [],
+      user_id: userId,
+      created_at: new Date(),
+      updated_at: new Date(),
+      status: CartStatuses.OPEN
     };
 
     this.userCarts[ userId ] = userCart;
@@ -24,8 +38,8 @@ export class CartService {
     return userCart;
   }
 
-  findOrCreateByUserId(userId: string): Cart {
-    const userCart = this.findByUserId(userId);
+  async findOrCreateByUserId(userId: string): Promise<CartEntity> {
+    const userCart = await this.findByUserId(userId);
 
     if (userCart) {
       return userCart;
@@ -34,8 +48,8 @@ export class CartService {
     return this.createByUserId(userId);
   }
 
-  updateByUserId(userId: string, { items }: Cart): Cart {
-    const { id, ...rest } = this.findOrCreateByUserId(userId);
+  async updateByUserId(userId: string, { items }: CartEntity): Promise<CartEntity> {
+    const { id, ...rest } = await this.findOrCreateByUserId(userId);
 
     const updatedCart = {
       id,
@@ -48,7 +62,7 @@ export class CartService {
     return { ...updatedCart };
   }
 
-  removeByUserId(userId): void {
+  removeByUserId(userId: string): void {
     this.userCarts[ userId ] = null;
   }
 

@@ -1,8 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { CartItem } from "./CartItem";
+import { CartItemEntity } from "./CartItem";
+import { CartStatuses } from "src/cart";
 
 @Entity()
-export class Cart {
+export class CartEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
@@ -17,10 +18,10 @@ export class Cart {
 
   @Column({
     type: "enum",
-    enum: ["OPEN", "ORDERED"],
+    enum: CartStatuses,
   })
-  status: "OPEN" | "ORDERED";
+  status: CartStatuses;
 
-  @OneToMany(() => CartItem, (cartItem) => cartItem.cart)
-  items: CartItem[];
+  @OneToMany(() => CartItemEntity, (cartItem) => cartItem.cart)
+  items: CartItemEntity[];
 }
