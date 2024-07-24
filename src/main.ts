@@ -3,7 +3,7 @@ import { Handler, Context, Callback } from 'aws-lambda';
 import { createServer, proxy } from 'aws-serverless-express';
 import * as express from 'express';
 import 'reflect-metadata';
-import { createConnection } from 'typeorm';
+import { Connection, createConnection } from 'typeorm';
 import { Cart } from './entities/Cart';
 import { CartItem } from './entities/CartItem';
 import * as dotenv from 'dotenv';
