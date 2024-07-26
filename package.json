@@ -8,6 +8,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build --webpack",
+    "deploy": "npm run build && cd my-cdk-project && npm run cdk:deploy",
     "archive": "node createZipArchive.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

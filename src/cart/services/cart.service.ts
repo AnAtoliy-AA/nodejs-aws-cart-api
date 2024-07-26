@@ -6,6 +6,7 @@ import { CartStatuses } from '../';
 import { CartItemEntity } from '../../entities/CartItem';
 import { Repository } from 'typeorm';
 import { CartEntity } from '../../entities/Cart';
+import { UserEntity } from '../../entities/User';
 
 @Injectable()
 export class CartService {
@@ -16,26 +17,43 @@ export class CartService {
     private cartRepository: Repository<CartEntity>,
   ) {}
 
-  private userCarts: Record<string, CartEntity> = {};
-
-  async findByUserId(userId: string): Promise<CartEntity> {
-    return this.userCarts[ userId ];
+  async findByUserId(userId: string) {
+    return await this.cartRepository.findOne({
+      where: {
+        status: CartStatuses.OPEN,
+        user: {
+          id: userId,
+        },
+      },
+      relations: {
+        items: {
+          product: true,
+        },
+      },
+    });
   }
 
   async createByUserId(userId: string) {
-    const id = v4();
-    const userCart = {
-      id,
-      items: [],
-      user_id: userId,
-      created_at: new Date(),
-      updated_at: new Date(),
-      status: CartStatuses.OPEN
-    };
+    const cart = this.cartRepository.create({
+      status: CartStatuses.OPEN,
+    });
 
-    this.userCarts[ userId ] = userCart;
+    cart.user = new UserEntity({
+      id: userId,
+    });
 
-    return userCart;
+    const createdCart = await this.cartRepository.save(cart);
+
+    return await this.cartRepository.findOne({
+      where: {
+        id: createdCart.id,
+      },
+      relations: {
+        items: {
+          product: true,
+        },
+      },
+    });
   }
 
   async findOrCreateByUserId(userId: string): Promise<CartEntity> {
@@ -48,22 +66,24 @@ export class CartService {
     return this.createByUserId(userId);
   }
 
-  async updateByUserId(userId: string, { items }: CartEntity): Promise<CartEntity> {
+  async updateByUserId(
+    userId: string,
+    { items }: CartEntity,
+  ): Promise<CartEntity> {
     const { id, ...rest } = await this.findOrCreateByUserId(userId);
 
     const updatedCart = {
       id,
       ...rest,
-      items: [ ...items ],
-    }
+      items: [...items],
+    };
 
-    this.userCarts[ userId ] = { ...updatedCart };
+    // this.userCarts[ userId ] = { ...updatedCart };
 
     return { ...updatedCart };
   }
 
   removeByUserId(userId: string): void {
-    this.userCarts[ userId ] = null;
+    // this.userCarts[ userId ] = null;
   }
-
 }

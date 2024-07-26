@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 import { CartItemEntity } from "./CartItem";
 import { CartStatuses } from "../cart/models";
+import { UserEntity } from "./User";
+import { OrderEntity } from "./Order";
 
 @Entity()
 export class CartEntity {
@@ -22,6 +24,16 @@ export class CartEntity {
   })
   status: CartStatuses;
 
-  @OneToMany(() => CartItemEntity, (cartItem) => cartItem.cart)
+  @ManyToOne(() => UserEntity, (user) => user.carts, { nullable: false })
+  user: UserEntity;
+
+  @OneToMany(() => CartItemEntity, (cartItem) => cartItem.cart, {
+    cascade: true,
+  })
   items: CartItemEntity[];
+
+  @OneToOne(() => OrderEntity, (order) => order.cart, {
+    nullable: true,
+  })
+  order: OrderEntity;
 }

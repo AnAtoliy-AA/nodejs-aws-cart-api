@@ -4,9 +4,13 @@ import { createServer, proxy } from 'aws-serverless-express';
 import * as express from 'express';
 import 'reflect-metadata';
 import { Connection, createConnection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { CartEntity } from './entities/Cart';
 import { CartItemEntity } from './entities/CartItem';
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from '@aws-sdk/client-secrets-manager';
 
 import helmet from 'helmet';
 
@@ -35,14 +39,12 @@ async function bootstrap() {
   });
   app.use(helmet());
 
-  await app.listen(port);
   await app.init();
 
   return createServer(expressApp);
 }
 
-let cachedConnection: Connection | null = null;
-let cachedServer: any = null; 
+let cachedServer: any = null;
 
 export const handler: Handler = async (
   event: any,
@@ -50,25 +52,7 @@ export const handler: Handler = async (
   callback: Callback,
 ) => {
   try {
-    console.log('LAMBDA ENV: ', process.env.DB_HOST)
-
-    if (!cachedConnection) {
-      const { username, password } = await getDatabaseCredentials(process.env.DB_SECRET_ARN as string);
-
-      console.log('Database Credentials: ', username, password)
-
-      cachedConnection = await createConnection({
-        type: 'postgres',
-        host: process.env.DB_HOST,
-        port: parseInt(process.env.DB_PORT || '5432', 10),
-        username,
-        password,
-        database: process.env.DB_NAME,
-        entities: [CartEntity, CartItemEntity],
-        synchronize: true,
-      });
-      console.log('Connected to PostgreSQL');
-    }
+    console.log('LAMBDA ENV: ', process.env.DB_HOST);
 
     if (!cachedServer) {
       cachedServer = await bootstrap();
@@ -78,6 +62,6 @@ export const handler: Handler = async (
     return proxy(cachedServer, event, context, 'PROMISE').promise;
   } catch (error) {
     console.error('Error:', error);
-    throw error; 
+    throw error;
   }
 };
