@@ -10,6 +10,7 @@
     "build": "nest build --webpack",
     "deploy": "npm run build && cd my-cdk-project && npm run cdk:deploy",
     "archive": "node createZipArchive.js",
+    "ad": "npm run archive && npm run deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
