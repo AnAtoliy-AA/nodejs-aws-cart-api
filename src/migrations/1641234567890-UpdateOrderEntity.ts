@@ -49,6 +49,6 @@ export class UpdateEntities1641234567890 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "carts" ALTER COLUMN "user_id" SET NOT NULL`,
     );
-    await queryRunner.query(`ALTER TABLE "carts" DROP COLUMN "userId"`);
+    // await queryRunner.query(`ALTER TABLE "carts" DROP COLUMN "userId"`);
   }
 }
