@@ -8,7 +8,7 @@ import { OrderModule } from './order/order.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import * as dotenv from 'dotenv';
-import { dataSourceOptions } from './dbSource/dbSource';
+import { dataSourceOptions } from './data-source';
 
 dotenv.config();
 

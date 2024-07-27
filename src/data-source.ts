@@ -1,11 +1,11 @@
 
 import { config } from 'dotenv';
-import { CartEntity } from '../entities/Cart';
-import { CartItemEntity } from '../entities/CartItem';
+import { CartEntity } from './entities/Cart';
+import { CartItemEntity } from './entities/CartItem';
 import { DataSourceOptions, DataSource } from 'typeorm';
-import { OrderEntity } from '../entities/Order';
-import { ProductEntity } from '../entities/Product';
-import { UserEntity } from '../entities/User';
+import { OrderEntity } from './entities/Order';
+import { ProductEntity } from './entities/Product';
+import { UserEntity } from './entities/User';
 
 config();
 
@@ -22,7 +22,7 @@ export const dataSourceOptions: DataSourceOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   synchronize: true,
-  migrationsRun: false,
+  migrations: ['./migrations/*.ts'],
   logging: true,
 
   host: process.env.DB_HOST,

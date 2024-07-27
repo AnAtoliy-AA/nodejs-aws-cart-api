@@ -9,7 +9,7 @@ import {
 import { CartEntity } from './Cart';
 import { ProductEntity } from './Product';
 
-@Entity()
+@Entity('cartItems')
 export class CartItemEntity {
   constructor(partialEntity: Partial<CartItemEntity>) {
     Object.assign(this, partialEntity);

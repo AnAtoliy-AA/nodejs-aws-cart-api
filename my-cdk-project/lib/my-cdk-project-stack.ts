@@ -42,8 +42,15 @@ export class MyCdkProjectStack extends cdk.Stack {
       },
     });
 
-    api.root.addProxy({
-      defaultIntegration: new apigateway.LambdaIntegration(nestLambda),
-    });
+    const cartResource = api.root.addResource('cart')
+
+    // const cartApiLambdaIntegration = api.root.addProxy({
+    //   defaultIntegration: new apigateway.LambdaIntegration(nestLambda),
+    // });
+
+    const cartApiLambdaIntegration =  new apigateway.LambdaIntegration(nestLambda)
+    
+
+    cartResource.addMethod('GET', cartApiLambdaIntegration)
   }
 }

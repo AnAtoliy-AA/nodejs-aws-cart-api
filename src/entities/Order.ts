@@ -37,6 +37,7 @@ export class OrderEntity {
   @Column({
     type: 'enum',
     enum: OrderStatuses,
+    nullable: true
   })
   status: OrderStatuses;
 
