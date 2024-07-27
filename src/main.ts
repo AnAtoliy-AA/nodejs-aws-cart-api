@@ -15,10 +15,11 @@ import {
 import helmet from 'helmet';
 
 import { AppModule } from './app.module';
+import serverlessExpress from '@codegenie/serverless-express';
 
 const port = process.env.PORT || 4000;
 
-const expressApp = express();
+// const expressApp = express();
 
 async function getDatabaseCredentials(secretArn: string) {
   const client = new SecretsManagerClient({ region: 'eu-central-1' });
@@ -41,7 +42,9 @@ async function bootstrap() {
 
   await app.init();
 
-  return createServer(expressApp);
+  // return createServer(expressApp);
+  const expressApp = app.getHttpAdapter().getInstance();
+  return serverlessExpress({ app: expressApp });
 }
 
 let cachedServer: any = null;
@@ -59,7 +62,9 @@ export const handler: Handler = async (
       console.log('App is running on port %s', process.env.PORT || '3000'); // Adjust as necessary
     }
 
-    return proxy(cachedServer, event, context, 'PROMISE').promise;
+    // return proxy(cachedServer, event, context, 'PROMISE').promise;
+    cachedServer = cachedServer ?? (await bootstrap());
+  return cachedServer(event, context, callback);
   } catch (error) {
     console.error('Error:', error);
     throw error;
