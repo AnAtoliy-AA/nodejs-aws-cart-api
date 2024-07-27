@@ -30,7 +30,7 @@ export class UserEntity {
   carts: CartEntity[];
 
   @OneToMany(() => OrderEntity, (order) => order.user)
-  orders: CartEntity[];
+  orders: OrderEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -4,9 +4,9 @@ import { CartStatuses } from "../cart/models";
 import { UserEntity } from "./User";
 import { OrderEntity } from "./Order";
 
-@Entity()
+@Entity('carts')
 export class CartEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
@@ -19,7 +19,7 @@ export class CartEntity {
   updated_at: Date;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: CartStatuses,
   })
   status: CartStatuses;

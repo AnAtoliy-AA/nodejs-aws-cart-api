@@ -27,7 +27,7 @@ export class ProductEntity {
   price: number;
 
   @OneToOne(() => CartItemEntity, (cartItem) => cartItem.product, {
-    nullable: false,
+    nullable: true,
   })
   cartItem: CartItemEntity;
 }
