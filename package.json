@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "nest build --webpack",
+    "build": "nest build --webpack --webpackPath webpack.config.js",
     "deploy": "npm run build && cd my-cdk-project && npm run cdk:deploy",
     "archive": "node createZipArchive.js",
     "ad": "npm run archive && npm run deploy",
