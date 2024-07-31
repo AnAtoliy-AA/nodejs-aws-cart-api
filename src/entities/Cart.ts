@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { CartItemEntity } from './CartItem';
 import { CartStatuses } from '../cart/models';
 import { OrderEntity } from './Order';
@@ -11,10 +11,10 @@ export class CartEntity {
   @Column({ type: 'uuid', name: 'user_id' })
   user_id: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   created_at: Date;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn()
   updated_at: Date;
 
   @Column({ type: 'enum', enum: CartStatuses })

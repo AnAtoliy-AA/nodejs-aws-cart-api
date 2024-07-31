@@ -30,7 +30,7 @@ export class CartController {
   // @UseGuards(BasicAuthGuard)
   @Get(':userId')
   async findUserCart(@Param('userId') userId: string) {
-    const cart = await this.cartService.findOrCreateByUserId(userId);
+    const cart = await this.cartService.findByUserId(userId);
 
     return {
       statusCode: HttpStatus.OK,

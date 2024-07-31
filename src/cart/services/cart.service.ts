@@ -31,6 +31,8 @@ export class CartService {
       cart = this.cartRepository.create({
         user_id: userId ?? v4(),
         status: CartStatuses.OPEN,
+        created_at: new Date(),
+        updated_at: new Date(),
       });
       await this.cartRepository.save(cart);
     }
