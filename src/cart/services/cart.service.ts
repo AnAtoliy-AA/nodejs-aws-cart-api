@@ -6,31 +6,35 @@ import { CartStatuses } from '../';
 import { CartItemEntity } from '../../entities/CartItem';
 import { Repository } from 'typeorm';
 import { CartEntity } from '../../entities/Cart';
-import { UserEntity } from '../../entities/User';
 
 @Injectable()
 export class CartService {
   constructor(
     @InjectRepository(CartItemEntity)
-    private cartItemsRepository: Repository<CartItemEntity>,
+    private readonly cartItemsRepository: Repository<CartItemEntity>,
     @InjectRepository(CartEntity)
-    private cartRepository: Repository<CartEntity>,
+    private readonly cartRepository: Repository<CartEntity>,
   ) {}
+  async findByUserId(userId: string): Promise<CartEntity | undefined> {
+    return this.cartRepository
+      .createQueryBuilder('cart')
+      .leftJoinAndSelect('cart.items', 'item')
+      .leftJoinAndSelect('item.product', 'product')
+      .where('cart.user_id = :userId', { userId })
+      .andWhere('cart.status = :status', { status: 'OPEN' })
+      .getOne();
+  }
 
-  async findByUserId(userId: string) {
-    return await this.cartRepository.findOne({
-      where: {
+  async findOrCreateByUserId(userId: string): Promise<CartEntity> {
+    let cart = await this.findByUserId(userId);
+    if (!cart) {
+      cart = this.cartRepository.create({
+        user_id: userId ?? v4(),
         status: CartStatuses.OPEN,
-        user: {
-          id: userId,
-        },
-      },
-      relations: {
-        items: {
-          product: true,
-        },
-      },
-    });
+      });
+      await this.cartRepository.save(cart);
+    }
+    return cart;
   }
 
   async createByUserId(userId: string) {
@@ -38,9 +42,9 @@ export class CartService {
       status: CartStatuses.OPEN,
     });
 
-    cart.user = new UserEntity({
-      id: userId,
-    });
+    // cart.users = new UserEntity({
+    //   id: userId,
+    // });
 
     const createdCart = await this.cartRepository.save(cart);
 
@@ -56,15 +60,15 @@ export class CartService {
     });
   }
 
-  async findOrCreateByUserId(userId: string): Promise<CartEntity> {
-    const userCart = await this.findByUserId(userId);
+  // async findOrCreateByUserId(userId: string): Promise<CartEntity> {
+  //   const userCart = await this.findByUserId(userId);
 
-    if (userCart) {
-      return userCart;
-    }
+  //   if (userCart) {
+  //     return userCart;
+  //   }
 
-    return this.createByUserId(userId);
-  }
+  //   return this.createByUserId(userId);
+  // }
 
   async updateByUserId(
     userId: string,

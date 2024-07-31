@@ -1,15 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToOne, OneToOne } from "typeorm";
-import { CartItemEntity } from "./CartItem";
-import { CartStatuses } from "../cart/models";
-import { UserEntity } from "./User";
-import { OrderEntity } from "./Order";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { CartItemEntity } from './CartItem';
+import { CartStatuses } from '../cart/models';
+import { OrderEntity } from './Order';
 
 @Entity('carts')
 export class CartEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('uuid')
+  @Column({ type: 'uuid', name: 'user_id' })
   user_id: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
