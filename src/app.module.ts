@@ -9,6 +9,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import * as dotenv from 'dotenv';
 import { dataSourceOptions } from './data-source';
+import { CartEntity } from './entities/Cart';
+import { CartItemEntity } from './entities/CartItem';
+import { OrderEntity } from './entities/Order';
+import { ProductEntity } from './entities/Product';
+import { UserEntity } from './entities/User';
 
 dotenv.config();
 
@@ -18,10 +23,15 @@ dotenv.config();
     CartModule,
     OrderModule,
     TypeOrmModule.forRoot(dataSourceOptions),
+    TypeOrmModule.forFeature([
+      CartEntity,
+      CartItemEntity,
+      OrderEntity,
+      ProductEntity,
+      UserEntity,
+    ]),
   ],
-  controllers: [
-    AppController,
-  ],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}

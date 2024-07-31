@@ -9,31 +9,21 @@ export class CartEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column('uuid')
   user_id: string;
 
-  @Column()
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @Column()
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
-  @Column({
-    type: 'enum',
-    enum: CartStatuses,
-  })
+  @Column({ type: 'enum', enum: CartStatuses })
   status: CartStatuses;
 
-  @ManyToOne(() => UserEntity, (user) => user.carts, { nullable: false })
-  user: UserEntity;
-
-  @OneToMany(() => CartItemEntity, (cartItem) => cartItem.cart, {
-    cascade: true,
-  })
+  @OneToMany(() => CartItemEntity, (item) => item.cart)
   items: CartItemEntity[];
 
-  @OneToOne(() => OrderEntity, (order) => order.cart, {
-    nullable: true,
-  })
-  order: OrderEntity;
+  @OneToMany(() => OrderEntity, (order) => order.cart_id)
+  orders: OrderEntity[];
 }

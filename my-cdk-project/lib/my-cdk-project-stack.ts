@@ -27,30 +27,30 @@ export class MyCdkProjectStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset(path.join(__dirname, '../../dist')),
       handler: 'bundle.handler',
-      memorySize: 512,
       timeout: cdk.Duration.seconds(30),
       functionName: 'MyNestAwsCartFunction',
       environment,
     });
 
     const api = new apigateway.LambdaRestApi(this, 'NestApi', {
+      deploy: true,
       handler: nestLambda,
-      proxy: false,
-      defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS,
-      },
+      restApiName: 'NestApi',
     });
 
-    const cartResource = api.root.addResource('cart')
+    new cdk.CfnOutput(this, 'cart', {
+      value: api.url,
+    });
 
-    // const cartApiLambdaIntegration = api.root.addProxy({
-    //   defaultIntegration: new apigateway.LambdaIntegration(nestLambda),
-    // });
+    // const cartResource = api.root.addResource('cart')
 
-    const cartApiLambdaIntegration =  new apigateway.LambdaIntegration(nestLambda)
+    // // const cartApiLambdaIntegration = api.root.addProxy({
+    // //   defaultIntegration: new apigateway.LambdaIntegration(nestLambda),
+    // // });
+
+    // const cartApiLambdaIntegration =  new apigateway.LambdaIntegration(nestLambda)
     
 
-    cartResource.addMethod('GET', cartApiLambdaIntegration)
+    // cartResource.addMethod('GET', cartApiLambdaIntegration)
   }
 }
