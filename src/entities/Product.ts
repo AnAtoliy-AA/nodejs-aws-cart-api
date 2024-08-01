@@ -1,33 +1,22 @@
 import {
   Entity,
   Column,
-  ManyToOne,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
-  OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { CartItemEntity } from './CartItem';
 
 @Entity('products')
 export class ProductEntity {
-  constructor(partialEntity: Partial<CartItemEntity>) {
-    Object.assign(this, partialEntity);
-  }
-
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('varchar')
+  @Column({ type: 'varchar' })
   title: string;
 
-  @Column('varchar')
-  description: string;
-
-  @Column({ type: 'integer' })
+  @Column({ type: 'decimal' })
   price: number;
 
-  @OneToOne(() => CartItemEntity, (cartItem) => cartItem.product, {
-    nullable: true,
-  })
-  cartItem: CartItemEntity;
+  @OneToMany(() => CartItemEntity, (cartItem) => cartItem.product)
+  cartItems: CartItemEntity[];
 }

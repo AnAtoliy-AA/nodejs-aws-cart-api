@@ -1,39 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToOne, OneToOne } from "typeorm";
-import { CartItemEntity } from "./CartItem";
-import { CartStatuses } from "../cart/models";
-import { UserEntity } from "./User";
-import { OrderEntity } from "./Order";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { CartItemEntity } from './CartItem';
+import { CartStatuses } from '../cart/models';
+import { OrderEntity } from './Order';
 
 @Entity('carts')
 export class CartEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'uuid', name: 'user_id' })
   user_id: string;
 
-  @Column()
+  @CreateDateColumn()
   created_at: Date;
 
-  @Column()
+  @UpdateDateColumn()
   updated_at: Date;
 
-  @Column({
-    type: 'enum',
-    enum: CartStatuses,
-  })
+  @Column({ type: 'enum', enum: CartStatuses })
   status: CartStatuses;
 
-  @ManyToOne(() => UserEntity, (user) => user.carts, { nullable: false })
-  user: UserEntity;
-
-  @OneToMany(() => CartItemEntity, (cartItem) => cartItem.cart, {
-    cascade: true,
-  })
+  @OneToMany(() => CartItemEntity, (item) => item.cart)
   items: CartItemEntity[];
 
-  @OneToOne(() => OrderEntity, (order) => order.cart, {
-    nullable: true,
-  })
-  order: OrderEntity;
+  @OneToMany(() => OrderEntity, (order) => order.cart_id)
+  orders: OrderEntity[];
 }
