@@ -1,5 +1,9 @@
 const webpack = require('webpack');
 const path = require('path');
+const dotenv = require('dotenv');
+
+// Load environment variables from .env file
+dotenv.config();
 
 module.exports = (options) => {
   const lazyImports = [
@@ -11,7 +15,7 @@ module.exports = (options) => {
 
   return {
     ...config,
-    entry: ['./src/lambda.ts'],
+    entry: ['./src/main.ts'],
     externals: [],
     output: {
       path: path.resolve(__dirname, 'dist'),

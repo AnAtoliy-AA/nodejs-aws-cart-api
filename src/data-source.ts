@@ -9,6 +9,8 @@ import { UserEntity } from './entities/User';
 
 config();
 
+//TODO: !!if you don't connect to postgres DB check process.env. variables in .env file and in dataSourceOptions
+
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   entities: [

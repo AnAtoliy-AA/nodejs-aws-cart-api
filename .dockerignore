@@ -11,3 +11,5 @@ Dockerfile
 *.tgz
 *.yml
 *.yaml
+
+my-cdk-project
