@@ -1,14 +1,22 @@
 import { NestFactory } from '@nestjs/core';
-
+import { ExpressAdapter } from '@nestjs/platform-express';
+import express from 'express';
 import helmet from 'helmet';
-
 import { AppModule } from './app.module';
 
-const port = process.env.PORT || 4000;
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
+const port = process.env.PORT || 8080;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const expressApp = express();
 
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(expressApp),
+  );
   app.enableCors({
     origin: (req, callback) => callback(null, true),
   });
@@ -16,6 +24,7 @@ async function bootstrap() {
 
   await app.listen(port);
 }
+
 bootstrap().then(() => {
   console.log('App is running on %s port', port);
 });
